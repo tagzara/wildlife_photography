@@ -1,11 +1,22 @@
-require('./config/database.js')().then(() => {
+const express = require('express');
 
-    const config = require('./config/config.js');
-    const app = require('express')();
-    const appString = `Server is started, listening on port: ${config.port}...`;
+const { PORT } = require('./config');
+const databaseConfig = require('./config/database.js');
+const expressConfig = require('./config/express.js');
+const routesConfig = require('./config/routes.js');
 
-    require('./config/express.js')(app);
-    require('./config/routes.js')(app);
+start();
 
-    app.listen(config.port, console.log(appString));
-});
+async function start() {
+    const app = express();
+
+    await databaseConfig(app);
+    expressConfig(app);
+    routesConfig(app);
+
+    app.get('/', (req, res) => {
+        res.send('Let\'s start!');
+    });
+
+    app.listen(PORT, () => console.log(`Application is running at http://localhost:${PORT}`));
+};

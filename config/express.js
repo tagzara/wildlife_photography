@@ -1,21 +1,28 @@
 const express = require('express');
-const User = require('../controllers/users/User.js');
+const { engine } = require('express-handlebars');
 const cookieParser = require('cookie-parser');
-const handlebars = require('express-handlebars');
-const { cookie } = require('../config/config.js');
-const jwt = require('../utils/jwt');
+
+const authMiddleware = require('../middlewares/auth.js');
 
 module.exports = (app) => {
-    app.engine('hbs', handlebars({
-        layoutsDir: 'views',
-        defaultLayout: 'base-layout',
-        partialsDir: 'views/partials',
-        extname: 'hbs'
+    app.engine('hbs', engine({
+        extname: '.hbs',
     }));
-
-    app.use(express.static('public'));
     app.set('view engine', 'hbs');
-    app.use(express.json());
+
+    app.use('/public', express.static('public'));
+    app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
-    app.use(express.urlencoded({ extended: false }));
+    app.use(authMiddleware());
+
+    // app.use((req, res, next) => {
+    //     if (!req.url.includes('favicon')) {
+    //         console.log('>>>', req.method, req.url);
+
+    //         if (req.user) {
+    //             console.log('Known user', req.user.username);
+    //         }
+    //     }
+    //     next();
+    // });
 };

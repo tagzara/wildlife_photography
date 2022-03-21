@@ -1,5 +1,5 @@
-const routes = require('../routes');
+const authController = require('../controllers/authController.js');
 
 module.exports = (app) => {
-    //TODO
+    app.use('/auth', authController);
 };

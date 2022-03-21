@@ -1,13 +1,23 @@
 const mongoose = require('mongoose');
-const dbString = require('./config').dbUrl + 'wildlife';
-const rdyString = `${'*'.repeat(10)}Database is Ready${'*'.repeat(10)}}`;
 
-module.exports = () => {
-    return mongoose.connect(dbString, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useCreateIndex: true
-    },
-    console.log(rdyString)
-    );
+const { DB_CONNECTION_STRING } = require('./index.js');
+
+module.exports = (app) => {
+    return new Promise((resolve, reject) => {
+        mongoose.connect(DB_CONNECTION_STRING, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+
+        const db = mongoose.connection;
+        db.on('error', (err) => {
+            console.error('connection error:', err);
+            reject(err);
+        });
+
+        db.once('open', function () {
+            console.log('Database connected');
+            resolve();
+        });
+    });
 };
