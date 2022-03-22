@@ -9,7 +9,12 @@ router.get('/register', isGuest(), (req, res) => {
 router.post(
     '/register',
     isGuest(),
-    body('username').isLength({ min: 3 }).withMessage('Username must be at least 3 characters long'),
+    body('firstName').isLength({ min: 3 }).withMessage('First name must be at least 3 characters long!').bail()
+    .isAlpha('en-US').withMessage('First name may contain only English letters!'),
+    body('lastName').isLength({ min: 5 }).withMessage('Last name must be at least 5 characters long!').bail()
+    .isAlpha('en-US').withMessage('Last name may contain only English letters!'),
+    body('email').isEmail().withMessage('Email must be valid URL!'),
+    body('password').isLength({ min: 4} ).withMessage('Password must be at least 4 characters long!'),
     body('repeatPassword').custom((value, { req }) => {
         if (value != req.body.password) {
             throw new Error('Password don\'t match');
@@ -22,21 +27,23 @@ router.post(
 
         try {
             if (errors.length > 0) {
-                throw new Error('Validation error');
+                throw new Error(Object.values(errors).map(e => e.msg).join('\n'));
             }
 
-            await req.auth.register(req.body.username, req.body.password);
+            await req.auth.register(req.body.firstName.trim(), req.body.lastName.trim(), req.body.email.trim(), req.body.password.trim());
 
             console.log(errors);
             res.redirect('/');
         } catch (err) {
             const ctx = {
-                errors,
+                errors: err.message.split('\n'),
                 userData: {
-                    username: req.body.username
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
+                    email: req.body.email
                 }
             };
-            res.render('register', ctx);
+            res.render('user/register', ctx);
         }
     }
 );

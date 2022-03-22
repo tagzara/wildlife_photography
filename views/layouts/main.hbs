@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Home Page</title>
 
-   
+
     <link href="public/css/style.css" type="text/css" rel="stylesheet">
 </head>
 
@@ -15,13 +15,13 @@
 
     <div id="box">
 
-        <!-- In case of error, you should display div with class "error-container" -->
-        <!-- You can choose to display the first error or all of them (error message/s in your opinion) -->
-        <!--
+        {{#if errors}}
         <div class="error-container">
-            <p>Error</p>
-        </div>-->
-
+            {{#each errors}}
+                <p>{{this}}</p>
+            {{/each}}
+        </div>
+        {{/if}}
 
 
     </div>

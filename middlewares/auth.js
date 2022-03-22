@@ -7,12 +7,12 @@ const userService = require('../services/user.js');
 module.exports = () => (req, res, next) => {
     if (parseToken(req, res)) {
         req.auth = {
-            async register(username, password) {
-                const token = await register(username, password);
+            async register(firstName, lastName, email, password) {
+                const token = await register(firstName, lastName, email, password);
                 res.cookie(COOKIE_NAME, token);
             },
-            async login(username, password) {
-                const token = await login(username, password);
+            async login(firstName, lastName, email, password) {
+                const token = await login(firstName, lastName, email, password);
                 res.cookie(COOKIE_NAME, token);
             },
             logout() {
@@ -24,17 +24,17 @@ module.exports = () => (req, res, next) => {
     }
 };
 
-async function register(username, password) {
+async function register(firstName, lastName, email, password) {
     // TODO adapt parameters to project requirements
     // TODO extra validations
-    const existing = await userService.getUserByUsername(username);
+    const existing = await userService.getUserByEmail(email);
 
     if (existing) {
-        throw new Error('Username is taken!');
+        throw new Error('There already have a user with that email!');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await userService.createUser(username, hashedPassword);
+    const user = await userService.createUser(firstName, lastName, email, hashedPassword);
 
     return generateToken(user);
 }
@@ -58,7 +58,9 @@ async function login(username, password) {
 function generateToken(userData) {
     return jwt.sign({
         _id: userData._id,
-        username: userData.username
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
     }, TOKEN_SECRET);
 }
 
