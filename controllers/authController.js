@@ -3,7 +3,7 @@ const { body, validationResult } = require('express-validator');
 const { isGuest } = require('../middlewares/guards.js');
 
 router.get('/register', isGuest(), (req, res) => {
-    res.render('user/register');
+    res.render('user/register', {title: 'Register'});
 });
 
 router.post(
@@ -38,6 +38,7 @@ router.post(
             const ctx = {
                 errors: err.message.split('\n'),
                 userData: {
+                    title: 'Register',
                     firstName: req.body.firstName,
                     lastName: req.body.lastName,
                     email: req.body.email
@@ -49,7 +50,7 @@ router.post(
 );
 
 router.get('/login', isGuest(), (req, res) => {
-    res.render('user/login');
+    res.render('user/login', {title: 'Login'});
 });
 
 router.post('/login', isGuest(), async (req, res) => {
@@ -60,6 +61,7 @@ router.post('/login', isGuest(), async (req, res) => {
     } catch (err) {
         console.log(err);
         const ctx = {
+            title: 'Login',
             errors: [err.message],
             userData: {
                 email: req.body.email
