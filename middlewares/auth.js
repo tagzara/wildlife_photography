@@ -11,8 +11,8 @@ module.exports = () => (req, res, next) => {
                 const token = await register(firstName, lastName, email, password);
                 res.cookie(COOKIE_NAME, token);
             },
-            async login(firstName, lastName, email, password) {
-                const token = await login(firstName, lastName, email, password);
+            async login(email, password) {
+                const token = await login(email, password);
                 res.cookie(COOKIE_NAME, token);
             },
             logout() {
@@ -25,8 +25,6 @@ module.exports = () => (req, res, next) => {
 };
 
 async function register(firstName, lastName, email, password) {
-    // TODO adapt parameters to project requirements
-    // TODO extra validations
     const existing = await userService.getUserByEmail(email);
 
     if (existing) {
@@ -39,8 +37,8 @@ async function register(firstName, lastName, email, password) {
     return generateToken(user);
 }
 
-async function login(username, password) {
-    const user = await userService.getUserByUsername(username);
+async function login(email, password) {
+    const user = await userService.getUserByEmail(email);
 
     if (!user) {
         throw new Error('No such user!');

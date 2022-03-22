@@ -49,12 +49,12 @@ router.post(
 );
 
 router.get('/login', isGuest(), (req, res) => {
-    res.render('login');
+    res.render('user/login');
 });
 
 router.post('/login', isGuest(), async (req, res) => {
     try {
-        await req.auth.login(req.body.username, req.body.password);
+        await req.auth.login(req.body.email, req.body.password);
 
         res.redirect('/');
     } catch (err) {
@@ -62,10 +62,10 @@ router.post('/login', isGuest(), async (req, res) => {
         const ctx = {
             errors: [err.message],
             userData: {
-                username: req.body.username
+                email: req.body.email
             }
         };
-        res.render('login', ctx);
+        res.render('user/login', ctx);
     }
 });
 
