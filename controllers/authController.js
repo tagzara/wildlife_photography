@@ -3,7 +3,7 @@ const { body, validationResult } = require('express-validator');
 const { isGuest } = require('../middlewares/guards.js');
 
 router.get('/register', isGuest(), (req, res) => {
-    res.render('register');
+    res.render('user/register');
 });
 
 router.post(
