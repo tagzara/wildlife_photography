@@ -1,4 +1,9 @@
+const postService = require('../services/posts.js');
+
 module.exports = () => (req, res, next) => {
-    // TODO import and decorate services
-    req.storage = {};
+    req.storage = {
+        ...postService
+    };
+
+    next();
 };
