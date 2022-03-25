@@ -27,9 +27,10 @@ router.post('/create', isUser(), async (req, res) => {
             createdAt: req.body.createdAt.trim(),
             imageUrl: req.body.imageUrl.trim(),
             description: req.body.description.trim(),
-            author: req.user._id
+            author: req.user._id,
+            myPosts: []
         };
-
+        
         await req.storage.createPost(postData);
 
         res.redirect('/');
@@ -55,9 +56,8 @@ router.post('/create', isUser(), async (req, res) => {
 router.get('/details/:id', async (req, res) => {
     try {
         const post = await req.storage.getPostById(req.params.id);
-        post.authorName = req.user.firstName + ' ' + req.user.lastName;
-
-        // post.hasUser = Boolean(req.user);
+        
+        post.hasUser = Boolean(req.user);
         // post.isAuthor = req.user && req.user._id == post.author;
         // play.liked = req.user && play.usersLiked.find(u => u._id == req.user._id);
 
@@ -72,9 +72,9 @@ router.get('/edit/:id', isUser(), async (req, res) => {
     try {
         const post = await req.storage.getPostById(req.params.id);
 
-        // if (post.author != req.user._id) {
-        //     throw new Error('Cannot edit post you haven\'t created!');
-        // }
+         if (post.author != req.user._id) {
+             throw new Error('Cannot edit post you haven\'t created!');
+         }
 
         res.render('posts/edit', { post });
     } catch (err) {
@@ -108,6 +108,22 @@ router.post('/edit/:id', isUser(), async (req, res) => {
             }
         }
         res.render('posts/edit', ctx);
+    }
+});
+
+router.get('/delete/:id', isUser(), async (req, res) => {
+    try {
+        const post = await req.storage.getPostById(req.params.id);
+
+        if (post.author != req.user._id) {
+            throw new Error('Cannot delete post you haven\'t created!');
+        }
+
+        await req.storage.deletePost(req.params.id)
+        res.redirect('/');
+    } catch (err) {
+        console.log(err.message);
+        res.redirect('/posts/details/' + req.params.id);
     }
 });
 

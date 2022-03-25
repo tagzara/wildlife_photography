@@ -14,6 +14,10 @@ async function createUser(firstName, lastName, email, hashedPassword) {
     return user;
 }
 
+async function getUserById(id) {
+    return User.findById(id).populate('myPosts').lean();
+}
+
 async function getUserByEmail(email) {
     const pattern = new RegExp(`^${email}$`, 'i')
     const user = await User.findOne({ email: { $regex: pattern } });
@@ -22,5 +26,6 @@ async function getUserByEmail(email) {
 
 module.exports = {
     createUser,
-    getUserByEmail
+    getUserByEmail,
+    getUserById
 };

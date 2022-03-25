@@ -1,4 +1,6 @@
 const Post = require('../models/Post.js');
+const User = require('../models/User.js');
+const { getUserById } = require('./user.js');
 
 async function getAllPosts() {
     const posts = await Post.find({}).lean();
@@ -20,7 +22,7 @@ async function createPost(postData) {
     if (existing) {
         throw new Error('A post with this name already exists!');
     }
-
+    
     const post = new Post(postData);
 
     await post.save();
@@ -41,9 +43,24 @@ async function editPost(id, postData) {
     return post.save();
 }
 
+async function addMyPost(postId, userId) {
+    const post = await Post.findById(postId);
+    const user = await User.findById(userId);
+
+    user.myPosts.push(post);
+
+    return user.save();
+}
+
+async function deletePost(id) {
+    return Post.findByIdAndDelete(id);
+}
+
 module.exports = {
     getAllPosts,
     getPostById,
     createPost,
-    editPost
+    editPost,
+    addMyPost,
+    deletePost
 };
